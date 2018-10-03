@@ -28,16 +28,7 @@ public class PresenceEventListener {
     @EventListener
     private void handleSessionConnected(SessionConnectEvent event) {
         String sessionId = SimpMessageHeaderAccessor.wrap(event.getMessage()).getSessionId();
-
-        Optional<ChatParticipant> chatParticipantOptional = repository.findBySessionId(sessionId);
-        ChatParticipant chatParticipant;
-
-        if(chatParticipantOptional.isPresent()) {
-            chatParticipant = chatParticipantOptional.get();
-            chatParticipant.setSessionId(sessionId);
-        } else
-            chatParticipant = new ChatParticipant(sessionId, defaultUsername);
-
+        ChatParticipant chatParticipant = new ChatParticipant(sessionId, defaultUsername);
         repository.save(chatParticipant);
         messagingTemplate.convertAndSend(loginDestination, new ChatParticipantDto(chatParticipant));
     }
@@ -47,8 +38,7 @@ public class PresenceEventListener {
         repository.findBySessionId(event.getSessionId())
                 .ifPresent(chatParticipant -> {
                     messagingTemplate.convertAndSend(logoutDestination, chatParticipant);
-                    chatParticipant.setSessionId(null);
-                    repository.save(chatParticipant);
+                    repository.delete(chatParticipant);
                 });
     }
 }
