@@ -13,8 +13,9 @@ import java.util.Optional;
 
 public class PresenceEventListener {
 
-    private String loginDestination = "/chat/login";
-    private String logoutDestination = "/chat/logout";
+    private String defaultUsername = "Visitor";
+    private String loginDestination = "/participant/login";
+    private String logoutDestination = "/participant/logout";
     private SimpMessagingTemplate messagingTemplate;
     private ChatParticipantRepository repository;
 
@@ -28,11 +29,14 @@ public class PresenceEventListener {
     private void handleSessionConnected(SessionConnectEvent event) {
         String sessionId = SimpMessageHeaderAccessor.wrap(event.getMessage()).getSessionId();
 
-        ChatParticipant chatParticipant = repository.findBySessionId(sessionId);
-        if(chatParticipant == null)
-            chatParticipant = new ChatParticipant(sessionId);
-        else
+        Optional<ChatParticipant> chatParticipantOptional = repository.findBySessionId(sessionId);
+        ChatParticipant chatParticipant;
+
+        if(chatParticipantOptional.isPresent()) {
+            chatParticipant = chatParticipantOptional.get();
             chatParticipant.setSessionId(sessionId);
+        } else
+            chatParticipant = new ChatParticipant(sessionId, defaultUsername);
 
         repository.save(chatParticipant);
         messagingTemplate.convertAndSend(loginDestination, new ChatParticipantDto(chatParticipant));
@@ -40,7 +44,7 @@ public class PresenceEventListener {
 
     @EventListener
     private void handleSessionDisconnect(SessionDisconnectEvent event) {
-        Optional.ofNullable(repository.findBySessionId(event.getSessionId()))
+        repository.findBySessionId(event.getSessionId())
                 .ifPresent(chatParticipant -> {
                     messagingTemplate.convertAndSend(logoutDestination, chatParticipant);
                     chatParticipant.setSessionId(null);

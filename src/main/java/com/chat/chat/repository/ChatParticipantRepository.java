@@ -5,10 +5,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatParticipantRepository extends CrudRepository<ChatParticipant, Long> {
     @Override
     List<ChatParticipant> findAll();
-    ChatParticipant findBySessionId(String sessionId);
+    Optional<ChatParticipant> findBySessionId(String sessionId);
 }

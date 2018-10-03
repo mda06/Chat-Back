@@ -9,12 +9,22 @@ public class ChatParticipant {
     @Id @GeneratedValue
     private long id;
     private String sessionId;
+    private String username;
 
     public ChatParticipant() {
     }
 
-    public ChatParticipant(String sessionId) {
+    public ChatParticipant(String sessionId, String username) {
         this.sessionId = sessionId;
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public long getId() {
