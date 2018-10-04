@@ -61,6 +61,7 @@ public class RoomController {
             ChatParticipant participant = optParticipant.get();
             ChatMessage msg = new ChatMessage(message, participant.getUsername(), Timestamp.from(Instant.now()).getTime());
             room.getMessages().add(msg);
+            msg.setRoom(room);
             chatMessageRepository.save(msg);
             roomRepository.save(room);
             template.convertAndSend("/room/receive/" + roomId, new ChatMessageDto(msg));
