@@ -14,11 +14,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,6 +53,13 @@ public class RoomController {
                     return room;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @MessageMapping("/room/add")
+    public void onAddRoom(String roomName) {
+        Room room = new Room(0, roomName, Collections.emptyList());
+        roomRepository.save(room);
+        template.convertAndSend("/room/created", new RoomDto(room));
     }
 
     @MessageMapping("/room/send/{roomId}")
