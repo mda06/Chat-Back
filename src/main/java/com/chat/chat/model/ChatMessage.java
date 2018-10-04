@@ -3,6 +3,7 @@ package com.chat.chat.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class ChatMessage {
@@ -11,6 +12,11 @@ public class ChatMessage {
     private String message;
     private String username;
     private long timestamp;
+    @ManyToOne
+    private Room room;
+
+    public ChatMessage() {
+    }
 
     public ChatMessage(String message, String username, long timestamp) {
         this.message = message;
@@ -21,6 +27,14 @@ public class ChatMessage {
     public String getMessage() {
 
         return message;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public void setMessage(String message) {
