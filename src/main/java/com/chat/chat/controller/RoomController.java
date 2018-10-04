@@ -46,7 +46,10 @@ public class RoomController {
         return roomRepository.findAll().stream()
                 .map(RoomDto::new)
                 .map(room -> {
-                    room.setMessages(room.getMessages().stream().limit(10).collect(Collectors.toList()));
+                    room.setMessages(room.getMessages().stream()
+                            .sorted((m1, m2) -> (int)(m1.getTimestamp() - m2.getTimestamp()))
+                            .skip(Math.max(0, room.getMessages().size() - 10))
+                            .collect(Collectors.toList()));
                     return room;
                 })
                 .collect(Collectors.toList());
